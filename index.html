@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programma di Viaggio: 29 Maggio - 3 Giugno 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* Fix per altezza su mobile */
+        html, body { height: 100%; margin: 0; font-family: sans-serif; }
+        #map { height: 100%; min-height: 400px; }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
+
+    <div class="w-full md:w-2/5 lg:w-1/3 bg-white p-6 overflow-y-auto h-1/2 md:h-full shadow-xl z-10 border-r border-slate-200">
+        <h1 class="text-2xl font-bold text-indigo-900 mb-1">🚗 On the Road Francia</h1>
+        <p class="text-sm text-slate-500 mb-6 font-medium">29 Maggio - 3 Giugno 2026</p>
+
+        <div class="space-y-6">
+            <div class="border-l-2 border-indigo-500 pl-4">
+                <h3 class="font-bold text-indigo-700 text-lg">Venerdì 29 Maggio: Arrivo</h3>
+                <div class="mt-2 space-y-2 text-sm">
+                    <p onclick="focusMap(0)" class="cursor-pointer hover:text-indigo-600 font-semibold">📍 21:45 - Aeroporto Orly (ORY)</p>
+                    <p onclick="focusMap(1)" class="cursor-pointer hover:text-indigo-600 font-semibold">🏨 Notte - Greet Hotel Versailles</p>
+                </div>
+            </div>
+
+            <div class="border-l-2 border-emerald-500 pl-4">
+                <h3 class="font-bold text-emerald-700 text-lg">Sabato 30 Maggio: Versailles</h3>
+                <div class="mt-2 space-y-2 text-sm">
+                    <p onclick="focusMap(2)" class="cursor-pointer hover:text-emerald-600 font-semibold">🏰 09:30 - Reggia di Versailles</p>
+                    <p onclick="focusMap(3)" class="cursor-pointer hover:text-emerald-600 font-semibold">🏨 Notte - Les Maisons de Mélody</p>
+                </div>
+            </div>
+
+            <div class="border-l-2 border-amber-500 pl-4">
+                <h3 class="font-bold text-amber-700 text-lg">Domenica 31 Maggio: Giverny & Chartres</h3>
+                <div class="mt-2 space-y-2 text-sm">
+                    <p onclick="focusMap(4)" class="cursor-pointer hover:text-amber-600 font-semibold">🌸 10:30 - Casa e Giardini Monet (Giverny)</p>
+                    <p onclick="focusMap(5)" class="cursor-pointer hover:text-amber-600 font-semibold">🏨 Notte - Hôtellerie Saint Yves (Chartres)</p>
+                    <p class="text-xs text-slate-500">✨ Sera: Spettacolo Chartres en Lumières nel centro storico</p>
+                </div>
+            </div>
+
+            <div class="border-l-2 border-purple-500 pl-4">
+                <h3 class="font-bold text-purple-700 text-lg">Lunedì 1 Giugno: Castelli e Vetrate</h3>
+                <div class="mt-2 space-y-2 text-sm">
+                    <p onclick="focusMap(5)" class="cursor-pointer hover:text-purple-600 font-semibold">⛪ Mattina - Cattedrale di Chartres</p>
+                    <p onclick="focusMap(6)" class="cursor-pointer hover:text-purple-600 font-semibold">🏰 Pomeriggio - Château de Maintenon</p>
+                    <p onclick="focusMap(7)" class="cursor-pointer hover:text-purple-600 font-semibold">🏨 Notte - Apparthôtel Clamart</p>
+                </div>
+            </div>
+
+            <div class="border-l-2 border-rose-500 pl-4">
+                <h3 class="font-bold text-rose-700 text-lg">Martedì 2 Giugno: Parchi e Rose</h3>
+                <div class="mt-2 space-y-2 text-sm">
+                    <p onclick="focusMap(8)" class="cursor-pointer hover:text-rose-600 font-semibold">🌳 Mattina - Domaine de Sceaux</p>
+                    <p onclick="focusMap(9)" class="cursor-pointer hover:text-rose-600 font-semibold">🌹 14:00 - Roseraie L'Haÿ-les-Roses</p>
+                    <p onclick="focusMap(10)" class="cursor-pointer hover:text-rose-600 font-semibold">⚰️ 16:00 - Tomba di Nurajev (Sainte-Geneviève)</p>
+                    <p onclick="focusMap(11)" class="cursor-pointer hover:text-rose-600 font-semibold">🏨 Notte - Choisy-le-Roi</p>
+                </div>
+            </div>
+
+            <div class="border-l-2 border-blue-500 pl-4">
+                <h3 class="font-bold text-blue-700 text-lg">Mercoledì 3 Giugno: Rientro</h3>
+                <div class="mt-2 space-y-2 text-sm">
+                    <p onclick="focusMap(0)" class="cursor-pointer hover:text-blue-600 font-semibold">✈️ 06:00 - Riconsegna auto a Orly (ORY)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map" class="w-full md:w-3/5 lg:w-2/3"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Array dei luoghi [Latitudine, Longitudine, Titolo, Descrizione]
+        const locations = [
+            [48.7262, 2.3652, "Aeroporto Parigi Orly (ORY)", "Ritiro auto ore 22:30 presso Dollar (Terminal Ovest)"], // 0
+            [48.7818, 2.0526, "Greet Hotel Versailles", "Voisins-le-Bretonneux. Parcheggio gratuito e colazione inclusa."], // 1
+            [48.8049, 2.1204, "Reggia di Versailles", "Ingresso ore 09:30 (Porta A, Pavillon Dufour) con Billet Passeport."], // 2
+            [49.0734, 1.3639, "Les Maisons de Mélody", "Houlbec-Cocherel. Alloggio seconda notte."], // 3
+            [49.0753, 1.5338, "Casa e Giardini di Claude Monet", "Giverny. Parcheggiare al Parking du Verger gratuito."], // 4
+            [48.4461, 1.4908, "Chartres (Hotel & Cattedrale)", "Hôtellerie Saint Yves, Cattedrale e spettacolo Chartres en Lumières."], // 5
+            [48.5852, 1.5781, "Château de Maintenon", "Visita nel pomeriggio. Ricordarsi i biglietti!"], // 6
+            [48.7905, 2.2359, "Residence Service Apparthôtel", "Clamart, 442 Avenue du Général De Gaulle."], // 7
+            [48.7753, 2.2994, "Domaine de Sceaux", "Passeggiata nel parco monumentale e picnic."], // 8
+            [48.7774, 2.3364, "Roseraie de L'Haÿ-les-Roses", "Splendida fioritura di rose nel primo pomeriggio."], // 9
+            [48.6318, 2.3458, "Cimitero Russo di Sainte-Geneviève-des-Bois", "Tomba monumentale a mosaico di Rudolf Nurajev."], // 10
+            [48.7612, 2.4172, "Alloggio Choisy-le-Roi", "60 Avenue de Lugo. Attenzione: parcheggio non disponibile in struttura."] // 11
+        ];
+
+        // Inizializza la mappa centrata sulla zona di Parigi/Chartres
+        const map = L.map('map').setView([48.75, 2.0], 9);
+
+        // Stile della mappa pulito e moderno (CartoDB Positron)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        }).addTo(map);
+
+        const markerObjects = [];
+        const coordinatesLine = [];
+
+        // Crea i marker sulla mappa
+        locations.forEach((loc, index) => {
+            const marker = L.marker([loc[0], loc[1]]).addTo(map)
+                .bindPopup(`<strong>${index + 1}. ${loc[2]}</strong><br><span style="font-size:13px; color:#4a5568;">${loc[3]}</span>`);
+            
+            markerObjects.push(marker);
+            coordinatesLine.push([loc[0], loc[1]]);
+        });
+
+        // Ordine logico del viaggio per tracciare la linea del percorso sulla mappa
+        const routeOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0];
+        const orderedCoordinates = routeOrder.map(index => coordinatesLine[index]);
+
+        // Disegna la linea del road trip
+        const polyline = L.polyline(orderedCoordinates, {
+            color: '#6366f1',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '5, 10'
+        }).addTo(map);
+
+        // Funzione per zoomare sul punto cliccato dalla sidebar
+        function focusMap(index) {
+            map.setView([locations[index][0], locations[index][1]], 13);
+            markerObjects[index].openPopup();
+            
+            // Su dispositivi mobili, fa uno scroll fluido verso la mappa quando si clicca
+            if (window.innerWidth < 768) {
+                document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>
